@@ -13,6 +13,7 @@ clf = load('neigh.ml')
 app = FastAPI(title="Iris ML API", description="API for iris dataset ml model", version="1.0")
 
 
+
 @app.post('/predict', tags=["predictions"])
 async def get_prediction(iris: Iris):
     data = dict(iris)['data']
