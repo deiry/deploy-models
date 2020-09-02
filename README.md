@@ -110,7 +110,7 @@ class Iris(BaseModel):
 
 3. Cargar el modelo entreanado, recuerda llamarlo igual. Además, se crea la instacia de FastAPI con su titulo y descripción.
 ```
-clf = load('model_neigh.ml')
+clf = load('model_neigh.joblib')
 
 app = FastAPI(title="Iris ML API", description="API for iris dataset ml model", version="1.0")
 
