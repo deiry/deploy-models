@@ -6,11 +6,14 @@ El código está disponible aqui. A continuación vamos a explorar acerca cómo 
 
 ## Antes de iniciar:
 
+
 Aquí hay algunos recursos que pueden ayudarte a familiarizarte:
 
 
 * Documentación de fastAPI [link](https://fastapi.tiangolo.com/)
 * Introducción a APIs [link](https://www.freecodecamp.org/news/what-is-an-api-in-english-please-b880a3214a82/)
+
+Y se deja como alternativa el uso de docker para correr la API, para ello se debe tener previamente instalado docker.
 
 Ahora sí, para iniciar vamos a ejecutar los siguientes comandos.
 ```
@@ -38,7 +41,7 @@ En este proyecto vamos a crear dos carpetas de la siguiente forma:
 
 * `model/model_building.ipynb` -  Donde vamos a entrenar y guardar el modelo en un archivo con extensión 'joblib' 
 * `model/api_testing.ipynb` - Donde vamos a probar la API, una vez se despliegue el modelo.
-* `model/model_1.joblib` - Modelo guardado.
+* `model/model_neigh.joblib` - Modelo guardado.
 * `app/main.py` - ¡Aquí está la magia de la API!
 * `Dockerfile` - Instancia de docker
 
@@ -110,7 +113,7 @@ class Iris(BaseModel):
 
 3. Cargar el modelo entreanado, recuerda llamarlo igual. Además, se crea la instacia de FastAPI con su titulo y descripción.
 ```
-clf = load('model_neigh.ml')
+clf = load('model_neigh.joblib')
 
 app = FastAPI(title="Iris ML API", description="API for iris dataset ml model", version="1.0")
 
@@ -126,7 +129,7 @@ def get_prediction(data: List):
             "pred_proba": log_proba}
 ```  
 
-Debemos convertir las predicciones que están como `numpy.array()` en un lista, por esta razón, hacemos uso del método `tolist()``
+Debemos convertir las predicciones que están como `numpy.array()` en un lista, por esta razón, hacemos uso del método `tolist()`
 
 5. Inicializar el endpoint por método POST
 
@@ -141,28 +144,68 @@ async def predict(iris: Iris):
 Como se observa debe recibir un objeto tipo Iris, tal cual como se definió en el paso 2, para luego llamar el método hecho previamente y se encargue de entregarnos el resultado.
 A este punto, ya contamos con una API diseñada para hacer predicciones con un modelo que ya está entrenado. 
 
+6. [Opcional] Construir imagen de docker
+
+En el archivo llamado Dockerfile, este contiene la imagen oficial de FastAPI, en este [link](https://fastapi.tiangolo.com/deployment/) puedes encontrar más información.
+Adicionalmente, debemos instalar dos librerías en el contenedor (joblib, scikit-learn).
+
+```
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
+RUN pip install joblib scikit-learn
+
+COPY ./model/ /model/
+
+COPY ./app /app
+```
+
+Ahora bien, vamos a construir la imagen:
+`docker build -t myapi .`
+
+
+Y correrla:
+`docker run -d --name myapicontainer -p 80:80 myapi`
+
+¡Y eso es todo! Ya puede realizar solicitudes en `http://localhost/predict`.
+
 
 # Probando la API
 
-En el notebook llamado `api_testing.ipynb` vamos a probar la API. Recordemos que inicialmente guardamos .csv con los datos de prueba separados en el primera parte, es aquí donde daremos uso de este. 
+Se puede realizar de dos formas, la primera es en un notebook nuevo para esto debemos guardar los datos en un texto plano para cargalos y esto simula que son los datos nuevos para probarlos, para esto utilizaremos la partición inicial llamada X_test.
+En el notebook `model_building.ipynb` vamos a guardar en un .csv las muestras X_test, para luego cargarlos en el notebook `api_testing.ipynb`.
 
 Para iniciar importaremos la librería `requests` para hacer la petición POST a la API, y que nunca falte nuestro aliado numpy
 
 ```
 import requests
 import numpy as np
+import pandas as pd
 ```
 
 Vamos a cargar .csv de prueba y se enviará como parámetro tipo json, de esta forma enviaremos los datos por una petición POST indicando la URL que está disponible.
 
 ```
+df = pd.read_csv('/model/X_test.csv')
+X_test = df.to_numpy()
 data = {"data": X_test.tolist()}
 r = requests.post('http://localhost/predict', json = data)
 r.json()
 
 ```
 
-Por último, convertimos la respuesta con `r.json()`.
+Por último, convertimos la respuesta con `r.json()` y así es como debería aparecer:
+
+`{'prediction': [2, 1, 2, 2, 2, 1, 1, 2, 1, 1],
+ 'pred_proba': [[0.0, 0.0, 1.0],
+  [0.0, 1.0, 0.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.6666666666666666, 0.3333333333333333]]}`
 
 Hemos terminado, este es un tutorial básico para desplegar modelos.
 
