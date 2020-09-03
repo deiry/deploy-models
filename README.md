@@ -189,7 +189,19 @@ r.json()
 
 ```
 
-Por último, convertimos la respuesta con `r.json()`.
+Por último, convertimos la respuesta con `r.json()` y así es como debería aparecer:
+
+`{'prediction': [2, 1, 2, 2, 2, 1, 1, 2, 1, 1],
+ 'pred_proba': [[0.0, 0.0, 1.0],
+  [0.0, 1.0, 0.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.6666666666666666, 0.3333333333333333],
+  [0.0, 0.6666666666666666, 0.3333333333333333]]}`
 
 Hemos terminado, este es un tutorial básico para desplegar modelos.
 
