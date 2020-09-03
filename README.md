@@ -171,18 +171,22 @@ Y correrla:
 
 # Probando la API
 
-En el notebook llamado `api_testing.ipynb` vamos a probar la API. Recordemos que inicialmente guardamos .csv con los datos de prueba separados en el primera parte, es aquí donde daremos uso de este. 
+Se puede realizar de dos formas, la primera es en un notebook nuevo para esto debemos guardar los datos en un texto plano para cargalos y esto simula que son los datos nuevos para probarlos, para esto utilizaremos la partición inicial llamada X_test.
+En el notebook `model_building.ipynb` vamos a guardar en un .csv las muestras X_test, para luego cargarlos en el notebook `api_testing.ipynb`.
 
 Para iniciar importaremos la librería `requests` para hacer la petición POST a la API, y que nunca falte nuestro aliado numpy
 
 ```
 import requests
 import numpy as np
+import pandas as pd
 ```
 
 Vamos a cargar .csv de prueba y se enviará como parámetro tipo json, de esta forma enviaremos los datos por una petición POST indicando la URL que está disponible.
 
 ```
+df = pd.read_csv('/model/X_test.csv')
+X_test = df.to_numpy()
 data = {"data": X_test.tolist()}
 r = requests.post('http://localhost/predict', json = data)
 r.json()
