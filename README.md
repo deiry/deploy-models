@@ -41,7 +41,7 @@ En este proyecto vamos a crear dos carpetas de la siguiente forma:
 
 * `model/model_building.ipynb` -  Donde vamos a entrenar y guardar el modelo en un archivo con extensión 'joblib' 
 * `model/api_testing.ipynb` - Donde vamos a probar la API, una vez se despliegue el modelo.
-* `model/model_1.joblib` - Modelo guardado.
+* `model/model_neigh.joblib` - Modelo guardado.
 * `app/main.py` - ¡Aquí está la magia de la API!
 * `Dockerfile` - Instancia de docker
 
