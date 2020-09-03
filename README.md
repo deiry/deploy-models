@@ -6,11 +6,14 @@ El código está disponible aqui. A continuación vamos a explorar acerca cómo 
 
 ## Antes de iniciar:
 
+
 Aquí hay algunos recursos que pueden ayudarte a familiarizarte:
 
 
 * Documentación de fastAPI [link](https://fastapi.tiangolo.com/)
 * Introducción a APIs [link](https://www.freecodecamp.org/news/what-is-an-api-in-english-please-b880a3214a82/)
+
+Y se deja como alternativa el uso de docker para correr la API, para ello se debe tener previamente instalado docker.
 
 Ahora sí, para iniciar vamos a ejecutar los siguientes comandos.
 ```
@@ -126,7 +129,7 @@ def get_prediction(data: List):
             "pred_proba": log_proba}
 ```  
 
-Debemos convertir las predicciones que están como `numpy.array()` en un lista, por esta razón, hacemos uso del método `tolist()``
+Debemos convertir las predicciones que están como `numpy.array()` en un lista, por esta razón, hacemos uso del método `tolist()`
 
 5. Inicializar el endpoint por método POST
 
@@ -140,6 +143,30 @@ async def predict(iris: Iris):
 
 Como se observa debe recibir un objeto tipo Iris, tal cual como se definió en el paso 2, para luego llamar el método hecho previamente y se encargue de entregarnos el resultado.
 A este punto, ya contamos con una API diseñada para hacer predicciones con un modelo que ya está entrenado. 
+
+6. [Opcional] Construir imagen de docker
+
+En el archivo llamado Dockerfile, este contiene la imagen oficial de FastAPI, en este [link](https://fastapi.tiangolo.com/deployment/) puedes encontrar más información.
+Adicionalmente, debemos instalar dos librerías en el contenedor (joblib, scikit-learn).
+
+```
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
+RUN pip install joblib scikit-learn
+
+COPY ./model/ /model/
+
+COPY ./app /app
+```
+
+Ahora bien, vamos a construir la imagen:
+`docker build -t myapi .`
+
+
+Y correrla:
+`docker run -d --name myapicontainer -p 80:80 myapi`
+
+¡Y eso es todo! Ya puede realizar solicitudes en `http://localhost/predict`.
 
 
 # Probando la API
